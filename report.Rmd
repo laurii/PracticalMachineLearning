@@ -1,0 +1,113 @@
+---
+title: "Report"
+author: "Laurii"
+date: "21 Feb 2015"
+output: html_document
+---
+
+## This is a report of Practical Machine Learning Course in Coursera Data Science Specialisation track
+
+## Task descirption 
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. 
+These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+Loading required libraries
+```{r,echo = TRUE}
+library(caret)
+```
+
+Downloading and reading data if not done already
+```{r, echo=TRUE}
+# Downloading the data
+if (!file.exists("pml-training.csv")){
+    url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+    download.file(url,destfile = "pml-training.csv",method = "curl")
+    }
+if (!file.exists("pml-testing.csv")){
+    url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+    download.file(url,destfile = "pml-testing.csv",method = "curl")
+    }
+
+# reading data
+df <- read.csv(file = "pml-training.csv", sep = ",", head = TRUE,na.strings=c("NA","#DIV/0!",""))
+df_test <- read.csv(file = "pml-testing.csv", sep = ",", head = TRUE,na.strings=c("NA","#DIV/0!",""))
+```
+
+Converting variables to be numeric.
+First 7 columns will be skiped as those do not infuence the classe variable. 
+Other columns will be converted to numeric format
+```{r, echo=TRUE}
+df <- df[,-c(1:7)]
+for (i in (1:(dim(df)[2]-1))){
+    df[,i] <- as.numeric(as.character(df[,i]))
+}
+
+df_test <- df_test[,-c(1:7)]
+for (i in (1:(dim(df_test)[2]-1))){
+    df_test[,i] <- as.numeric(as.character(df_test[,i]))
+}
+
+non.na.columns <-apply(!is.na(df),2,sum)>19621
+# subset for non.na.columns
+df<- df[,non.na.columns]
+#names(non.na.columns)
+```
+
+
+Splitting data into training and cross-validation datasets
+```{r, echo=TRUE}
+inTrain <- createDataPartition(y=df$classe,p=0.6, list=FALSE)
+training <- df[inTrain,]
+validation <- df[-inTrain,]
+dim(training); 
+dim(validation)
+```
+
+Using randomForest algorithm for making classification model. 
+Also applying parrallel computing for increasing computation time.
+
+```{r}
+library(doMC)
+registerDoMC(cores = 12)
+Model<-train(classe~.,data=training,method="rf",
+                trControl=trainControl(method="cv",number=5),
+                prox=TRUE,allowParallel=TRUE)
+
+print(Model)
+```
+
+Making predictions on training set
+```{r, echo=TRUE}
+pred.on.train <- predict(Model, newdata=training)
+confusionMatrix(pred.on.train,training$classe)
+```
+As the prediction on training set is 100 accrate, we minght have very good model or overfitter model.
+Lets have the prediction on validation set
+
+Making prediction on validation set
+```{r, echo=TRUE}
+pred.on.validation <- predict(Model, newdata=validation)
+confusionMatrix(pred.on.validation,validation$classe)
+```
+The accuracy of the model is 99% on the validation set that is randomly selected out 
+of the initial data and has not been used in the training. 
+So we have created very good model.
+
+
+## Preparing for the testing data
+```{r}
+answers = rep("A", 20)
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+testing_data <- df_test[,non.na.columns[non.na.columns!='classe']]
+answers <- predict(Model, newdata=testing_data)
+
+pml_write_files(answers)
+```
+
