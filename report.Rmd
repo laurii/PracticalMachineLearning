@@ -96,7 +96,7 @@ print(Model)
 Making predictions on training set
 ```{r, echo=TRUE}
 pred.on.train <- predict(Model, newdata=training)
-confusionMatrix(pred.on.train,training$classe)
+print(confusionMatrix(pred.on.train,training$classe))
 ```
 As the prediction on training set is 100% accrate, we minght have very good model or overfitted model.
 Lets have the prediction on validation dataset
@@ -104,7 +104,7 @@ Lets have the prediction on validation dataset
 Making prediction on validation set
 ```{r, echo=TRUE}
 pred.on.validation <- predict(Model, newdata=validation)
-confusionMatrix(pred.on.validation,validation$classe)
+print(confusionMatrix(pred.on.validation,validation$classe))
 ```
 The accuracy of the model is 99% on the validation set that is equal to out of sample error level.
 As the validation set is randomly selected out of the initial data and has not been used in the training it should describe the actual results on very good level. 
