@@ -71,9 +71,22 @@ img {
 <div id="this-is-a-report-of-practical-machine-learning-course-in-coursera-data-science-specialisation-track" class="section level2">
 <h2>This is a report of Practical Machine Learning Course in Coursera Data Science Specialisation track</h2>
 </div>
-<div id="task-descirption" class="section level2">
-<h2>Task descirption</h2>
+<div id="bakcground-information" class="section level2">
+<h2>Bakcground information</h2>
 <p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a> (see the section on the Weight Lifting Exercise Dataset).</p>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>The training data for this project are available here: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv</a></p>
+<p>The test data are available here: <a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv</a></p>
+<p>The data for this project come from this source: <a href="http://groupware.les.inf.puc-rio.br/har">http://groupware.les.inf.puc-rio.br/har</a>. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.</p>
+</div>
+<div id="goal-of-the-analysis" class="section level2">
+<h2>Goal of the analysis</h2>
+<p>The goal of your project is to predict the manner in which they did the exercise. This is the “classe” variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases.</p>
+</div>
+<div id="analysis" class="section level2">
+<h2>Analysis</h2>
 <p>Loading required libraries</p>
 <pre class="r"><code>library(caret)</code></pre>
 <pre><code>## Loading required package: lattice
@@ -138,14 +151,14 @@ Model&lt;-train(classe~.,data=training,method=&quot;rf&quot;,
 ## No pre-processing
 ## Resampling: Cross-Validated (5 fold) 
 ## 
-## Summary of sample sizes: 9421, 9421, 9421, 9420, 9421 
+## Summary of sample sizes: 9420, 9421, 9421, 9421, 9421 
 ## 
 ## Resampling results across tuning parameters:
 ## 
 ##   mtry  Accuracy   Kappa      Accuracy SD  Kappa SD   
-##    2    0.9875169  0.9842078  0.002157421  0.002729762
-##   27    0.9890453  0.9861416  0.003695034  0.004677077
-##   52    0.9809781  0.9759347  0.005771637  0.007306967
+##    2    0.9871776  0.9837773  0.003374304  0.004270735
+##   27    0.9872623  0.9838831  0.004747366  0.006008515
+##   52    0.9799594  0.9746393  0.007435958  0.009421534
 ## 
 ## Accuracy was used to select the optimal model using  the largest value.
 ## The final value used for the model was mtry = 27.</code></pre>
@@ -183,7 +196,7 @@ confusionMatrix(pred.on.train,training$classe)</code></pre>
 ## Detection Rate         0.2843   0.1935   0.1744   0.1639   0.1838
 ## Detection Prevalence   0.2843   0.1935   0.1744   0.1639   0.1838
 ## Balanced Accuracy      1.0000   1.0000   1.0000   1.0000   1.0000</code></pre>
-<p>As the prediction on training set is 100 accrate, we minght have very good model or overfitter model. Lets have the prediction on validation set</p>
+<p>As the prediction on training set is 100% accrate, we minght have very good model or overfitted model. Lets have the prediction on validation dataset</p>
 <p>Making prediction on validation set</p>
 <pre class="r"><code>pred.on.validation &lt;- predict(Model, newdata=validation)
 confusionMatrix(pred.on.validation,validation$classe)</code></pre>
@@ -191,34 +204,34 @@ confusionMatrix(pred.on.validation,validation$classe)</code></pre>
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 2223    8    0    0    0
-##          B    8 1509    5    0    0
-##          C    0    1 1360   14    4
-##          D    0    0    3 1272    5
-##          E    1    0    0    0 1433
+##          A 2226   19    0    0    0
+##          B    5 1494   11    1    0
+##          C    0    4 1354   19    2
+##          D    0    1    3 1265    4
+##          E    1    0    0    1 1436
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9938          
-##                  95% CI : (0.9918, 0.9954)
+##                Accuracy : 0.991           
+##                  95% CI : (0.9886, 0.9929)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
 ##                                           
-##                   Kappa : 0.9921          
+##                   Kappa : 0.9886          
 ##  Mcnemar's Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9960   0.9941   0.9942   0.9891   0.9938
-## Specificity            0.9986   0.9979   0.9971   0.9988   0.9998
-## Pos Pred Value         0.9964   0.9915   0.9862   0.9938   0.9993
-## Neg Pred Value         0.9984   0.9986   0.9988   0.9979   0.9986
+## Sensitivity            0.9973   0.9842   0.9898   0.9837   0.9958
+## Specificity            0.9966   0.9973   0.9961   0.9988   0.9997
+## Pos Pred Value         0.9915   0.9887   0.9819   0.9937   0.9986
+## Neg Pred Value         0.9989   0.9962   0.9978   0.9968   0.9991
 ## Prevalence             0.2845   0.1935   0.1744   0.1639   0.1838
-## Detection Rate         0.2833   0.1923   0.1733   0.1621   0.1826
-## Detection Prevalence   0.2843   0.1940   0.1758   0.1631   0.1828
-## Balanced Accuracy      0.9973   0.9960   0.9956   0.9939   0.9968</code></pre>
-<p>The accuracy of the model is 99% on the validation set that is randomly selected out of the initial data and has not been used in the training. So we have created very good model.</p>
+## Detection Rate         0.2837   0.1904   0.1726   0.1612   0.1830
+## Detection Prevalence   0.2861   0.1926   0.1758   0.1622   0.1833
+## Balanced Accuracy      0.9970   0.9908   0.9930   0.9912   0.9978</code></pre>
+<p>The accuracy of the model is 99% on the validation set that is equal to out of sample error level. As the validation set is randomly selected out of the initial data and has not been used in the training it should describe the actual results on very good level. So we have created very good model.</p>
 </div>
 <div id="preparing-for-the-testing-data" class="section level2">
 <h2>Preparing for the testing data</h2>
